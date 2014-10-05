@@ -81,6 +81,7 @@
         //create sticky table head
         if(this.options.stickyTableHeader){
             this.createStickyTableHeader();
+            this.adjustWidthsInStickyTableHeader();
         }
 
         // hide toggle button if the list is empty
@@ -99,6 +100,10 @@
 
             //update colspan and visibility of spanning cells
             $.proxy(that.updateSpanningCells(), that);
+
+            if(that.options.stickyTableHeader){
+                $.proxy(that.adjustWidthsInStickyTableHeader(), that);
+            }
 
         }).trigger('resize');
 
@@ -231,6 +236,7 @@
         if(this.$tableClone){
             this.$tableClone.toggleClass('display-all', activate);
         }
+        this.adjustWidthsInStickyTableHeader();
 
         if(trigger) {
             $(window).trigger(this.displayAllTrigger);
@@ -254,6 +260,8 @@
 
         //clone table head
         that.$tableClone = that.$table.clone();
+        that.$tableClone.find('tbody').remove();
+        that.$tableClone.find('tfoot').remove();
 
         //replace ids
         that.$tableClone.prop('id', this.id + '-clone');
@@ -284,6 +292,22 @@
 
         $(that.$tableScrollWrapper).bind('scroll', function(){
             $.proxy(that.updateStickyTableHeader(), that);
+        });
+    };
+
+    ResponsiveTable.prototype.adjustWidthsInStickyTableHeader = function() {
+        this.$tableClone.find('thead th').each(function(){
+            var $th = $(this);
+
+            // Get original ID
+            var orgID = $th.prop('id').replace('-clone', '');
+
+            // Get original width
+            var orgWidth = $('#' + orgID).css('width');
+
+            // Adjust width of th-clone to same as the original
+            $th.css({width: orgWidth, 'max-width': orgWidth, 'min-width': orgWidth});
+
         });
     };
 
@@ -475,6 +499,8 @@
                             }
                         }
                     });
+                    
+                    this.adjustWidthsInStickyTableHeader();
                 })
                 .bind('updateCheck', function(){
                     if ( $th.css('display') !== 'none') {
