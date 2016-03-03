@@ -263,7 +263,7 @@ table.focus-on tbody tr:hover {
 }
 table.focus-on tbody tr.unfocused th,
 table.focus-on tbody tr.unfocused td {
-  color: #999999;
+  color: #777777;
   color: rgba(0, 0, 0, 0.4);
 }
 table.focus-on tbody tr.focused th,
