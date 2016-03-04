@@ -50,11 +50,6 @@
 
         this.headerColIndices = {};
         this.headerRowIndices = {};
-
-        // Check if iOS
-        // property to save performance
-        this.iOS = isIOS();
-        this.iOSVersion = getIOSVersion();
       
         // Setup table
         // -------------------------
@@ -269,11 +264,7 @@
         that.$stickyTableHeader.css('height', that.$thead.height() + 2);
 
         //insert sticky table header
-        if($('html').hasClass('lt-ie10')){
-            that.$tableWrapper.prepend(that.$stickyTableHeader);
-        } else {
-            that.$table.before(that.$stickyTableHeader);
-        }
+        that.$table.before(that.$stickyTableHeader);
 
         // bind scroll and resize with updateStickyTableHeader
         $(this.options.mainContainer).bind('scroll', function(){
@@ -288,6 +279,16 @@
         $(that.$tableScrollWrapper).bind('scroll', function(){
             $.proxy(that.updateStickyTableHeader(), that);
         });
+
+
+        // determine what solution to use for rendereing  sticky table head (aboslute/fixed).
+        that.useFixedSolution  = !isIOS() || (that.getIOSVersion() >= 8);
+        //add class for rendering solution
+        if(that.useFixedSolution) {
+            that.$tableScrollWrapper.addClass('fixed-solution');
+        } else {
+            that.$tableScrollWrapper.removeClass('absolute-solution');
+        }
     };
 
     // Help function for sticky table header
@@ -298,8 +299,6 @@
           scrollTop         = $(this.options.mainContainer).scrollTop() -1, //-1 to accomodate for top border
           maxTop            = that.$table.height() - that.$stickyTableHeader.height(),
           rubberBandOffset  = (scrollTop + $(this.options.mainContainer).height()) - $(document).height(),
-        //          useFixedSolution  = that.$table.parent().prop('scrollWidth') === that.$table.parent().width();
-          useFixedSolution  = !that.iOS || (that.iOSVersion >= 8),
           navbarHeight      = 0;
 
         //Is there a fixed navbar?
@@ -322,11 +321,8 @@
         // console.log('tableHeight:' + that.$table.height());
         // console.log('shouldBeVisible:' + shouldBeVisible);
 
-        if(useFixedSolution) {
+        if(that.useFixedSolution) { //fixed solution
             that.$stickyTableHeader.scrollLeft(that.$tableScrollWrapper.scrollLeft());
-
-            //add fixedSolution class
-            that.$stickyTableHeader.addClass('fixed-solution');
 
             // Calculate top property value (-1 to accomodate for top border)
             top = navbarHeight - 1;
@@ -360,9 +356,6 @@
             }
 
         } else { // alternate method
-            //remove fixedSolution class
-            that.$stickyTableHeader.removeClass('fixed-solution');
-
             //animation duration
             var animationDuration = 400;
 
