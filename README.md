@@ -40,6 +40,12 @@ How to use:
 bower install RWD-Table-Patterns
 ```
 
+####Protip: Install using NPM
+```shell
+npm i RWD-Table-Patterns --save
+```
+
+
 ####Add CSS file to the ```<head>```
 ```html
 <link rel="stylesheet" href="css/rwd-table.min.css">
